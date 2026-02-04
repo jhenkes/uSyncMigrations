@@ -36,6 +36,9 @@ public class ContentTypeMigrationContext
     private Dictionary<string, string> _replacementAliases =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+    private Dictionary<string, string> _contentTypeVariations =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>
     ///  Add a content type key to the context.
     /// </summary>
@@ -320,6 +323,29 @@ public class ContentTypeMigrationContext
     public string GetReplacementAlias(string alias)
         => _replacementAliases.TryGetValue(alias, out var replacement)
             ? replacement : alias;
+
+    /// <summary>
+    /// Add variation info for a content type (e.g., "Nothing", "Culture", "Segment", "CultureAndSegment")
+    /// </summary>
+    public void AddVariation(string contentTypeAlias, string variation)
+        => _contentTypeVariations.TryAdd(contentTypeAlias, variation);
+
+    /// <summary>
+    /// Get the variation setting for a content type
+    /// </summary>
+    public string GetVariation(string contentTypeAlias)
+        => _contentTypeVariations.TryGetValue(contentTypeAlias, out var variation)
+            ? variation : "Nothing";
+
+    /// <summary>
+    /// Check if a content type varies by culture
+    /// </summary>
+    public bool VariesByCulture(string contentTypeAlias)
+    {
+        var variation = GetVariation(contentTypeAlias);
+        return variation.Equals("Culture", StringComparison.OrdinalIgnoreCase)
+            || variation.Equals("CultureAndSegment", StringComparison.OrdinalIgnoreCase);
+    }
 
 
     public void UpdatePropertyEditorTargets(DataTypeMigrationContext dataTypeContext)

@@ -121,7 +121,7 @@ internal abstract class SharedContentBaseHandler<TEntity> : SharedHandlerBase<TE
         target.Add(propertiesList);
 
         // check we have language title / and published statuses
-        EnsureLanguageTitles(target);
+        EnsureLanguageTitles(target, contentType, context);
 
         return target;
     }
@@ -266,8 +266,14 @@ internal abstract class SharedContentBaseHandler<TEntity> : SharedHandlerBase<TE
     ///  something was missing.
     /// </remarks>
 
-    protected virtual void EnsureLanguageTitles(XElement node)
+    protected virtual void EnsureLanguageTitles(XElement node, string contentType, SyncMigrationContext context)
     {
+        // Don't add language titles if the content type doesn't vary by culture
+        if (!context.ContentTypes.VariesByCulture(contentType))
+        {
+            return;
+        }
+
         var propertiesNode = node.Element("Properties");
         if (propertiesNode == null) return;
 

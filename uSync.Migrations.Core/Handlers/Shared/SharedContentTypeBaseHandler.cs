@@ -129,6 +129,10 @@ internal abstract class SharedContentTypeBaseHandler<TEntity> : SharedHandlerBas
         if (ItemType == nameof(ContentType))
         {
             CheckVariations(target);
+
+            // Store variation info in context for use by content handlers
+            var variations = target.Element("Info")?.Element("Variations")?.Value ?? "Nothing";
+            context.ContentTypes.AddVariation(alias, variations);
         }
 
         return target;
